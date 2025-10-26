@@ -165,6 +165,7 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
                     </div>
                   </div>
                   <Button onClick={() => handleAddItem(scannedItem)} className="w-full">
+                  <Button onClick={() => handleAddItem(scannedItem)} className="w-full">
                     Add to Wardrobe
                   </Button>
                 </motion.div>

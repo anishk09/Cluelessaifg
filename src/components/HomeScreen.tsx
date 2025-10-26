@@ -9,9 +9,10 @@ import logo from 'figma:asset/193fb722733955e40b908a73febec6ab789781c0.png';
 interface HomeScreenProps {
   onRefresh: () => void;
   onViewAnalytics?: () => void;
+  onOpenAIChat?: () => void;
 }
 
-export function HomeScreen({ onRefresh, onViewAnalytics }: HomeScreenProps) {
+export function HomeScreen({ onRefresh, onViewAnalytics, onOpenAIChat }: HomeScreenProps) {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const outfit = {
     top: {
@@ -302,21 +303,38 @@ export function HomeScreen({ onRefresh, onViewAnalytics }: HomeScreenProps) {
                 </div>
               </div>
 
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  if (onViewAnalytics) {
-                    onViewAnalytics();
-                  } else {
-                    toast.info('Opening detailed style analysis...');
-                  }
-                }}
-                className="w-full bg-primary text-primary-foreground py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors duration-200"
-              >
-                <span>View Full Analysis</span>
-                <ArrowRight className="w-4 h-4" strokeWidth={2} />
-              </motion.button>
+              <div className="grid grid-cols-2 gap-2">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    if (onOpenAIChat) {
+                      onOpenAIChat();
+                    } else {
+                      toast.info('Opening AI chat...');
+                    }
+                  }}
+                  className="bg-accent text-white py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-accent/90 transition-colors duration-200"
+                >
+                  <Sparkles className="w-4 h-4" strokeWidth={2} />
+                  <span>Ask AI</span>
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    if (onViewAnalytics) {
+                      onViewAnalytics();
+                    } else {
+                      toast.info('Opening detailed style analysis...');
+                    }
+                  }}
+                  className="bg-primary text-primary-foreground py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors duration-200"
+                >
+                  <span>Analysis</span>
+                  <ArrowRight className="w-4 h-4" strokeWidth={2} />
+                </motion.button>
+              </div>
             </div>
           </div>
         </motion.div>

@@ -35,6 +35,3 @@ function App() {
     </div>
   );
 }
-
-// Wrap with Amplify Authenticator
-export default withAuthenticator(App);
