@@ -67,13 +67,45 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
     }
   };
 
-  // ------------------ Search ------------------
+  // ------------------ Unified Search (Gemini + Google) ------------------
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
+
     try {
-      const res = await fetch(`http://localhost:4000/gemini?query=${encodeURIComponent(searchQuery)}`);
-      const data = await res.json();
-      setSearchResults(data);
+      // Gemini AI
+      const geminiRes = await fetch('https://api.gemini.com/suggest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_GEMINI_API_KEY}`,
+        },
+        body: JSON.stringify({ query: searchQuery }),
+      });
+      const geminiData = await geminiRes.json();
+      const geminiItems: FashionItem[] = geminiData.suggestions.map((s: any, index: number) => ({
+        id: `gemini-${index}`,
+        name: s.name || s.title || searchQuery,
+        image: s.image || '',
+        brand: s.brand,
+        category: s.category,
+        price: s.price,
+        color: s.color,
+      }));
+
+      // Google Custom Search (Images)
+      const googleRes = await fetch(
+        `https://www.googleapis.com/customsearch/v1?key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}&cx=${process.env.NEXT_PUBLIC_GOOGLE_CX_ID}&q=${encodeURIComponent(
+          searchQuery
+        )}&searchType=image`
+      );
+      const googleData = await googleRes.json();
+      const googleItems: FashionItem[] = (googleData.items || []).map((item: any, index: number) => ({
+        id: `google-${index}`,
+        name: item.title,
+        image: item.link,
+      }));
+
+      setSearchResults([...geminiItems, ...googleItems]);
     } catch (err) {
       console.error('Search error:', err);
     }
@@ -115,7 +147,7 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
             </TabsTrigger>
           </TabsList>
 
-          {/* -------- Picture Upload Tab -------- */}
+          {/* -------- Picture Tab -------- */}
           <TabsContent value="picture" className="space-y-4">
             <Label>Upload or take a picture</Label>
             <div className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer bg-secondary/30 hover:bg-secondary/50 transition-colors">
@@ -144,8 +176,9 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
             </div>
 
             <AnimatePresence>
-              {scannedItem && activeTab === 'picture' && (
+              {scannedItem && (
                 <motion.div
+                  key={scannedItem.id || 'scanned-item'}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
@@ -155,7 +188,7 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
                     <Check className="w-5 h-5" /> Item identified!
                   </div>
                   <div className="flex gap-3">
-                    <div className="w-20 h-20 rounded-lg overflow-hidden">
+                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
                       <ImageWithFallback src={scannedItem.image} alt={scannedItem.name} />
                     </div>
                     <div className="flex-1">
@@ -164,7 +197,6 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
                       <p className="text-xs text-muted-foreground mt-1">{scannedItem.category}</p>
                     </div>
                   </div>
-                  <Button onClick={() => handleAddItem(scannedItem)} className="w-full">
                   <Button onClick={() => handleAddItem(scannedItem)} className="w-full">
                     Add to Wardrobe
                   </Button>
@@ -188,43 +220,33 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
             </div>
 
             <AnimatePresence>
-  {scannedItem && activeTab === "picture" && (
-    <motion.div
-      key={scannedItem.id || "scanned-item"}
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -20, scale: 0.95 }}
-      transition={{ duration: 0.3 }}
-      className="bg-card border border-border rounded-xl p-4 space-y-3"
-    >
-      <div className="flex items-center gap-2 text-accent">
-        <Check className="w-5 h-5" />
-        <span>Item identified!</span>
-      </div>
-      <div className="flex gap-3">
-        <div className="w-20 h-20 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
-          <ImageWithFallback
-            src={scannedItem.image}
-            alt={scannedItem.name}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="flex-1">
-          <p className="text-foreground">{scannedItem.name}</p>
-          <p className="text-sm text-muted-foreground">{scannedItem.brand}</p>
-          <p className="text-xs text-muted-foreground mt-1">{scannedItem.category}</p>
-        </div>
-      </div>
-      <Button
-        onClick={() => handleAddWardrobeItem(scannedItem)}
-        className="w-full"
-      >
-        Add to Wardrobe
-      </Button>
-    </motion.div>
-  )}
-</AnimatePresence>
-
+              {scannedItem && (
+                <motion.div
+                  key={scannedItem.id || 'scanned-item-barcode'}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="bg-card border rounded-xl p-4 space-y-3"
+                >
+                  <div className="flex items-center gap-2 text-accent">
+                    <Check className="w-5 h-5" /> Item identified!
+                  </div>
+                  <div className="flex gap-3">
+                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
+                      <ImageWithFallback src={scannedItem.image} alt={scannedItem.name} />
+                    </div>
+                    <div className="flex-1">
+                      <p>{scannedItem.name}</p>
+                      <p className="text-sm text-muted-foreground">{scannedItem.brand}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{scannedItem.category}</p>
+                    </div>
+                  </div>
+                  <Button onClick={() => handleAddItem(scannedItem)} className="w-full">
+                    Add to Wardrobe
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </TabsContent>
 
           {/* -------- Search Tab -------- */}
@@ -260,9 +282,7 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
                       <p className="text-sm text-muted-foreground">{item.brand}</p>
                       <p className="text-sm text-accent mt-1">{item.price}</p>
                     </div>
-                    {item.color && (
-                      <div className="w-6 h-6 rounded-full" style={{ backgroundColor: item.color }} />
-                    )}
+                    {item.color && <div className="w-6 h-6 rounded-full" style={{ backgroundColor: item.color }} />}
                   </motion.div>
                 ))
               ) : (

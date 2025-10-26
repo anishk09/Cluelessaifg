@@ -1,7 +1,60 @@
-import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { OutfitSuggestionModal } from "./OutfitSuggestionModal";
+import { useEffect, useState } from 'react';
+
+interface TrendItem {
+  id: string;
+  name: string;
+  image: string;
+  source: string; // "Pinterest" or "TikTok"
+}
+
+interface WeatherData {
+  temp: number;
+  conditions: string;
+  description: string;
+}
+
+export function Trends({ zip }: { zip: string }) {
+  const [trends, setTrends] = useState<TrendItem[]>([]);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchTrends() {
+      try {
+        const res = await fetch(`/api/fetchTrends?zip=${zip}`);
+        const data = await res.json();
+        setWeather(data.weather);
+        setTrends(data.trends);
+      } catch (err) {
+        console.error('Error fetching trends:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchTrends();
+  }, [zip]);
+
+  if (loading) return <p>Loading trends...</p>;
+
+  return (
+    <div>
+      <h2>Trending Outfits ({weather?.description}, {weather?.temp}°F)</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        {trends.map(item => (
+          <div key={item.id} className="border rounded-lg p-2">
+            <img src={item.image} alt={item.name} className="w-full h-32 object-cover rounded-lg" />
+            <p className="text-sm font-medium mt-1">{item.name}</p>
+            <p className="text-xs text-muted-foreground">{item.source}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export interface FashionItem {
   id: string;
