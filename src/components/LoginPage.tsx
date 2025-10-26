@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
+import { toast } from 'sonner@2.0.3';
 import logo from 'figma:asset/193fb722733955e40b908a73febec6ab789781c0.png';
 
 interface LoginPageProps {
@@ -92,6 +93,7 @@ export function LoginPage({ onLogin, onBack }: LoginPageProps) {
                 <div className="text-right">
                   <button
                     type="button"
+                    onClick={() => toast.info('Password reset link sent to your email!')}
                     className="text-primary hover:underline"
                   >
                     Forgot password?

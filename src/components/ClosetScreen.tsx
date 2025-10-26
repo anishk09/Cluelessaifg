@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { motion } from 'motion/react';
+import { toast } from 'sonner@2.0.3';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { AddItemDialog } from './AddItemDialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from './ui/sheet';
+import { Button } from './ui/button';
 
 export function ClosetScreen() {
   const [isAddItemDialogOpen, setIsAddItemDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
   
   const categories = [
     {
@@ -110,6 +114,7 @@ export function ClosetScreen() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.3, delay: categoryIndex * 0.1 + itemIndex * 0.05 }}
                   whileHover={{ scale: 1.03, y: -4 }}
+                  onClick={() => setSelectedItem({ ...item, category: category.name })}
                   className="group cursor-pointer"
                 >
                   <div className="bg-card rounded-xl overflow-hidden shadow-sm border border-border group-hover:shadow-md transition-all duration-200">
@@ -137,6 +142,62 @@ export function ClosetScreen() {
         ))}
       </div>
       <AddItemDialog open={isAddItemDialogOpen} onOpenChange={setIsAddItemDialogOpen} />
+
+      {/* Item Detail Sheet */}
+      <Sheet open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
+        <SheetContent side="bottom" className="h-[80vh]">
+          <SheetHeader>
+            <SheetTitle>{selectedItem?.name}</SheetTitle>
+            <SheetDescription>{selectedItem?.category} - Wardrobe item details</SheetDescription>
+          </SheetHeader>
+          {selectedItem && (
+            <div className="mt-6 space-y-6">
+              <div className="aspect-square w-full max-w-md mx-auto rounded-xl overflow-hidden bg-secondary">
+                <ImageWithFallback
+                  src={selectedItem.image}
+                  alt={selectedItem.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-foreground mb-2">Color</h3>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-12 h-12 rounded-full border-2 border-white shadow-sm"
+                      style={{ backgroundColor: selectedItem.color }}
+                    />
+                    <span className="text-muted-foreground">{selectedItem.color}</span>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-foreground mb-2">Category</h3>
+                  <p className="text-muted-foreground">{selectedItem.category}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 pt-4">
+                  <Button
+                    onClick={() => {
+                      toast.success('Item details updated!');
+                      setSelectedItem(null);
+                    }}
+                  >
+                    Edit Item
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      toast.success('Item removed from wardrobe');
+                      setSelectedItem(null);
+                    }}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

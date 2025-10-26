@@ -6,6 +6,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Barcode, Camera, Search, Upload, X, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { toast } from 'sonner@2.0.3';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface AddItemDialogProps {
@@ -94,7 +95,7 @@ export function AddItemDialog({ open, onOpenChange }: AddItemDialogProps) {
 
   const handleAddItem = (item: any) => {
     // In a real app, this would add the item to the user's wardrobe
-    console.log('Adding item to wardrobe:', item);
+    toast.success(`${item.name} added to your wardrobe!`);
     onOpenChange(false);
     // Reset state
     setBarcodeInput('');
