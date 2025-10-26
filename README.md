@@ -24,5 +24,5 @@ No more “I have nothing to wear” moments.
 
 ---
 
-✨ *Built with love, caffeine (a LOT), and a lot of fashion sense by Team CluelessAI.*
+✨ *Built with love, caffeine (a LOT), and some fashion sense by Team CluelessAI.*
 
