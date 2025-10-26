@@ -1,16 +1,85 @@
-import React from "react";
-import { withAuthenticator } from "@aws-amplify/ui-react";
-import "@aws-amplify/ui-react/styles.css";
+import { useState } from "react";
+import { Navigation } from "./components/Navigation";
+import { HomeScreen } from "./components/HomeScreen";
+import { ClosetScreen } from "./components/ClosetScreen";
+import { AIChatDialog } from "./components/AIChatDialog";
+import { FloatingAIButton } from "./components/FloatingAIButton";
+import { ProfileScreen } from "./components/ProfileScreen";
+import { LandingPage } from "./components/LandingPage";
+import { LoginPage } from "./components/LoginPage";
+import { motion, AnimatePresence } from "motion/react";
+import { toast } from "sonner@2.0.3";
+import { Toaster } from "./components/ui/sonner";
 
-type AppProps = {
-  signOut: () => void;
-  user: {
-    username: string;
-    attributes?: Record<string, any>;
+export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [activeTab, setActiveTab] = useState<
+    "home" | "closet" | "profile"
+  >("home");
+  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
+
+  const handleRefresh = () => {
+    toast.success("Generating new outfit recommendation...");
+    // In a real app, this would fetch a new outfit recommendation
+    setTimeout(() => {
+      toast.success("New outfit is ready!");
+    }, 1500);
   };
-};
 
-function App({ signOut, user }: AppProps) {
+  const handleGetStarted = () => {
+    setShowLogin(true);
+  };
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    setShowLogin(false);
+  };
+
+  const handleBackToLanding = () => {
+    setShowLogin(false);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setShowLogin(false);
+    setActiveTab("home");
+  };
+
+  // Show landing page if not authenticated and not on login page
+  if (!isAuthenticated && !showLogin) {
+    return (
+      <>
+        <LandingPage onGetStarted={handleGetStarted} />
+        <Toaster />
+      </>
+    );
+  }
+
+  // Show login page
+  if (!isAuthenticated && showLogin) {
+    return (
+      <>
+        <LoginPage onLogin={handleLogin} onBack={handleBackToLanding} />
+        <Toaster />
+      </>
+    );
+  }
+
+  // Render main app screens
+  const renderScreen = () => {
+    switch (activeTab) {
+      case "home":
+        return <HomeScreen onRefresh={handleRefresh} onOpenAIChat={() => setIsAIChatOpen(true)} />;
+      case "closet":
+        return <ClosetScreen />;
+      case "profile":
+        return <ProfileScreen onLogout={handleLogout} />;
+      default:
+        return <HomeScreen onRefresh={handleRefresh} onOpenAIChat={() => setIsAIChatOpen(true)} />;
+    }
+  };
+
   return (
     <div className="size-full bg-background">
       <AnimatePresence mode="wait">
@@ -28,10 +97,18 @@ function App({ signOut, user }: AppProps) {
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
+      <FloatingAIButton onClick={() => setIsAIChatOpen(true)} />
+      <AIChatDialog 
+        isOpen={isAIChatOpen} 
+        onClose={() => setIsAIChatOpen(false)}
+        currentOutfit={{
+          top: 'Casual Hoodie',
+          bottom: 'Joggers',
+          shoes: 'White Sneakers',
+          weather: 'Sunny, 65°F'
+        }}
+      />
       <Toaster />
     </div>
   );
 }
-
-// Wrap with Amplify Authenticator
-export default withAuthenticator(App);

@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Barcode, Camera, Search, Upload, Check } from 'lucide-react';
+import { Barcode, Camera, Search, Upload, X, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner@2.0.3';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -12,10 +12,9 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 interface AddItemDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAddItem: (item: any) => void; // callback to update ClosetScreen
 }
 
-export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogProps) {
+export function AddItemDialog({ open, onOpenChange }: AddItemDialogProps) {
   const [activeTab, setActiveTab] = useState<'barcode' | 'picture' | 'search'>('picture');
   const [barcodeInput, setBarcodeInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,58 +23,81 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
 
-  // Barcode scan via backend API
-  const handleBarcodeScan = async () => {
-    if (!barcodeInput.trim()) return;
+  // Mock barcode scan
+  const handleBarcodeScan = () => {
     setIsScanning(true);
-    try {
-      const res = await fetch(`http://localhost:4000/barcode?code=${barcodeInput}`);
-      const data = await res.json();
-      setScannedItem(data);
-    } catch (err) {
-      console.error('Barcode API error:', err);
-    } finally {
+    setTimeout(() => {
       setIsScanning(false);
-    }
-  };
-
-  // Web search via backend API
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
-    try {
-      const res = await fetch(`http://localhost:4000/gemini?query=${encodeURIComponent(searchQuery)}`);
-      const data = await res.json();
-      setSearchResults(data);
-    } catch (err) {
-      console.error('Search API error:', err);
-    }
-  };
-
-  // Image upload via backend API
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    setUploadedImage(URL.createObjectURL(file));
-
-    try {
-      const res = await fetch('http://localhost:4000/image', {
-        method: 'POST',
-        body: formData,
+      setScannedItem({
+        name: 'Nike Air Max 90',
+        brand: 'Nike',
+        category: 'Shoes',
+        color: '#FFFFFF',
+        image: 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuaWtlJTIwc2hvZXN8ZW58MXx8fHwxNzYxNDIxMDY1fDA&ixlib=rb-4.1.0&q=80&w=1080',
       });
-      const data = await res.json();
-      setScannedItem(data);
-    } catch (err) {
-      console.error('Image upload API error:', err);
+    }, 2000);
+  };
+
+  // Mock web search
+  const handleSearch = () => {
+    if (!searchQuery.trim()) return;
+    
+    // Mock search results
+    setSearchResults([
+      {
+        id: 1,
+        name: `${searchQuery} - Classic`,
+        brand: 'Fashion Brand',
+        price: '$49.99',
+        image: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0c2hpcnQlMjBjbG90aGluZ3xlbnwxfHx8fDE3NjE0MjEwNjV8MA&ixlib=rb-4.1.0&q=80&w=1080',
+        color: '#4ECDC4',
+      },
+      {
+        id: 2,
+        name: `${searchQuery} - Premium`,
+        brand: 'Designer Co.',
+        price: '$89.99',
+        image: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwY2xvdGhpbmd8ZW58MXx8fHwxNzYxNDIxMDY1fDA&ixlib=rb-4.1.0&q=80&w=1080',
+        color: '#FF6B6B',
+      },
+      {
+        id: 3,
+        name: `${searchQuery} - Essential`,
+        brand: 'Basics Inc.',
+        price: '$29.99',
+        image: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYXN1YWwlMjBjbG90aGluZ3xlbnwxfHx8fDE3NjE0MjEwNjV8MA&ixlib=rb-4.1.0&q=80&w=1080',
+        color: '#2C2C2C',
+      },
+    ]);
+  };
+
+  // Mock image upload
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedImage(reader.result as string);
+        // Simulate AI recognition
+        setTimeout(() => {
+          setScannedItem({
+            name: 'Denim Jacket',
+            brand: 'Levi\'s',
+            category: 'Tops',
+            color: '#4169E1',
+            image: reader.result as string,
+          });
+        }, 1500);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const handleAddWardrobeItem = (item: any) => {
-    onAddItem(item); // update ClosetScreen state
+  const handleAddItem = (item: any) => {
+    // In a real app, this would add the item to the user's wardrobe
+    toast.success(`${item.name} added to your wardrobe!`);
     onOpenChange(false);
+    // Reset state
     setBarcodeInput('');
     setSearchQuery('');
     setScannedItem(null);
@@ -109,10 +131,10 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
             </TabsTrigger>
           </TabsList>
 
-          {/* Picture Upload */}
+          {/* Picture Upload Tab */}
           <TabsContent value="picture" className="space-y-4">
             <div className="space-y-3">
-              <Label>Upload or take a picture</Label>
+              <Label>Upload or take a picture of your item</Label>
               <div className="border-2 border-dashed border-border rounded-xl p-8 text-center bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer">
                 <input
                   type="file"
@@ -164,7 +186,7 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
                       <p className="text-xs text-muted-foreground mt-1">{scannedItem.category}</p>
                     </div>
                   </div>
-                  <Button onClick={() => handleAddWardrobeItem(scannedItem)} className="w-full">
+                  <Button onClick={() => handleAddItem(scannedItem)} className="w-full">
                     Add to Wardrobe
                   </Button>
                 </motion.div>
@@ -172,7 +194,7 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
             </AnimatePresence>
           </TabsContent>
 
-          {/* Barcode */}
+          {/* Barcode Scan Tab */}
           <TabsContent value="barcode" className="space-y-4">
             <div className="space-y-3">
               <Label htmlFor="barcode">Scan or enter barcode</Label>
@@ -186,6 +208,29 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
                 <Button onClick={handleBarcodeScan} disabled={isScanning}>
                   {isScanning ? 'Scanning...' : 'Scan'}
                 </Button>
+              </div>
+            </div>
+
+            <div className="border-2 border-dashed border-border rounded-xl p-8 text-center bg-secondary/30">
+              <div className="flex flex-col items-center gap-3">
+                <div className="p-4 bg-primary/10 rounded-full">
+                  {isScanning ? (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    >
+                      <Barcode className="w-8 h-8 text-primary" />
+                    </motion.div>
+                  ) : (
+                    <Barcode className="w-8 h-8 text-primary" />
+                  )}
+                </div>
+                <div>
+                  <p className="text-foreground">
+                    {isScanning ? 'Scanning barcode...' : 'Click scan to use camera'}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Position barcode in frame</p>
+                </div>
               </div>
             </div>
 
@@ -211,7 +256,7 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
                       <p className="text-xs text-muted-foreground mt-1">{scannedItem.category}</p>
                     </div>
                   </div>
-                  <Button onClick={() => handleAddWardrobeItem(scannedItem)} className="w-full">
+                  <Button onClick={() => handleAddItem(scannedItem)} className="w-full">
                     Add to Wardrobe
                   </Button>
                 </motion.div>
@@ -219,7 +264,7 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
             </AnimatePresence>
           </TabsContent>
 
-          {/* Search */}
+          {/* Web Search Tab */}
           <TabsContent value="search" className="space-y-4">
             <div className="space-y-3">
               <Label htmlFor="search">Search for clothing items</Label>
@@ -228,7 +273,7 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
                   id="search"
                   placeholder="e.g., blue denim jacket..."
                   value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 />
                 <Button onClick={handleSearch}>
@@ -245,7 +290,7 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="bg-card border border-border rounded-xl p-3 hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => handleAddWardrobeItem(item)}
+                    onClick={() => handleAddItem(item)}
                   >
                     <div className="flex gap-3">
                       <div className="w-20 h-20 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
