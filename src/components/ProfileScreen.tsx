@@ -1,11 +1,30 @@
 import { motion } from 'motion/react';
 import { User, Settings, Bell, Palette, MapPin, LogOut, ChevronRight } from 'lucide-react';
+import { toast } from 'sonner@2.0.3';
 
 interface ProfileScreenProps {
   onLogout: () => void;
 }
 
 export function ProfileScreen({ onLogout }: ProfileScreenProps) {
+  const handleSettingClick = (action: string) => {
+    switch (action) {
+      case 'profile':
+        toast.info('Opening profile editor...');
+        break;
+      case 'style':
+        toast.info('Opening style preferences...');
+        break;
+      case 'notifications':
+        toast.info('Opening notification settings...');
+        break;
+      case 'settings':
+        toast.info('Opening app settings...');
+        break;
+      default:
+        break;
+    }
+  };
   const settingsGroups = [
     {
       title: 'Account',
@@ -95,6 +114,7 @@ export function ProfileScreen({ onLogout }: ProfileScreenProps) {
                     key={item.label}
                     whileHover={{ backgroundColor: 'rgba(0, 0, 0, 0.02)' }}
                     whileTap={{ scale: 0.98 }}
+                    onClick={() => item.action && handleSettingClick(item.action)}
                     className="w-full flex items-center justify-between p-4 border-b border-border last:border-b-0 transition-colors duration-150"
                   >
                     <div className="flex items-center gap-3">

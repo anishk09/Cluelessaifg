@@ -1,5 +1,11 @@
 
-  # CluelessAi!
+  # CluelessAi
 
- This repository hosts the CluelessAI Web Application -> the world’s first AI-powered “do-it-yourself” smart wardrobe! Built with modern frameworks and real-time fashion trend analysis, CluelessAI helps users organize, style, and generate personalized outfit recommendations using machine learning and current fashion data.
+  This is a code bundle for CluelessAi. The original project is available at https://www.figma.com/design/LVN8EUWb5l2fJnyDCirz36/CluelessAi.
 
+  ## Running the code
+
+  Run `npm i` to install the dependencies.
+
+  Run `npm run dev` to start the development server.
+  
