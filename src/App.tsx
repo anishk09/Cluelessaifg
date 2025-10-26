@@ -1,4 +1,9 @@
-import React, { useState } from "react";
+import React, { useState } 
+import { ClosetScreen, FashionItem } from "./ClosetScreen";
+import { AddItemDialog } from "./AddItemDialog";
+import { Button } from "./ui/button";
+
+from "react";
 import { withAuthenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
