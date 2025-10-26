@@ -1,7 +1,11 @@
 import { motion } from 'motion/react';
 import { User, Settings, Bell, Palette, MapPin, LogOut, ChevronRight } from 'lucide-react';
 
-export function ProfileScreen() {
+interface ProfileScreenProps {
+  onLogout: () => void;
+}
+
+export function ProfileScreen({ onLogout }: ProfileScreenProps) {
   const settingsGroups = [
     {
       title: 'Account',
@@ -119,6 +123,7 @@ export function ProfileScreen() {
           transition={{ duration: 0.4, delay: 0.4 }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
+          onClick={onLogout}
           className="w-full bg-card text-destructive py-4 rounded-xl flex items-center justify-center gap-2 border border-border hover:bg-destructive/5 transition-colors duration-200"
         >
           <LogOut className="w-5 h-5" strokeWidth={2} />

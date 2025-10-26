@@ -1,49 +1,84 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { useState } from "react";
+import { Navigation } from "./components/Navigation";
+import { HomeScreen } from "./components/HomeScreen";
+import { ClosetScreen } from "./components/ClosetScreen";
+import { ProfileScreen } from "./components/ProfileScreen";
+import { LandingPage } from "./components/LandingPage";
+import { LoginPage } from "./components/LoginPage";
+import { motion, AnimatePresence } from "motion/react";
 
-interface Weather {
-  temp: number;
-  condition: string;
-}
+export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [activeTab, setActiveTab] = useState<
+    "home" | "closet" | "profile"
+  >("home");
 
-interface Trend {
-  name: string;
-  views: string;
-  image: string;
-}
+  const handleRefresh = () => {
+    // In a real app, this would fetch a new outfit recommendation
+    console.log("Refreshing outfit...");
+  };
 
-interface AppContextType {
-  weather: Weather | null;
-  trends: Trend[];
-}
+  const handleGetStarted = () => {
+    setShowLogin(true);
+  };
 
-const AppContext = createContext<AppContextType>({
-  weather: null,
-  trends: [],
-});
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    setShowLogin(false);
+  };
 
-export const useAppContext = () => useContext(AppContext);
+  const handleBackToLanding = () => {
+    setShowLogin(false);
+  };
 
-export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [weather, setWeather] = useState<Weather | null>(null);
-  const [trends, setTrends] = useState<Trend[]>([]);
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setShowLogin(false);
+    setActiveTab("home");
+  };
 
-  useEffect(() => {
-    // Fetch weather
-    fetch("http://localhost:5000/weather?city=New%20York")
-      .then((res) => res.json())
-      .then((data) => setWeather(data))
-      .catch(console.error);
+  // Show landing page if not authenticated and not on login page
+  if (!isAuthenticated && !showLogin) {
+    return <LandingPage onGetStarted={handleGetStarted} />;
+  }
 
-    // Fetch trends
-    fetch("http://localhost:5000/trends")
-      .then((res) => res.json())
-      .then((data) => setTrends(data))
-      .catch(console.error);
-  }, []);
+  // Show login page
+  if (!isAuthenticated && showLogin) {
+    return <LoginPage onLogin={handleLogin} onBack={handleBackToLanding} />;
+  }
+
+  // Render main app screens
+  const renderScreen = () => {
+    switch (activeTab) {
+      case "home":
+        return <HomeScreen onRefresh={handleRefresh} />;
+      case "closet":
+        return <ClosetScreen />;
+      case "profile":
+        return <ProfileScreen onLogout={handleLogout} />;
+      default:
+        return <HomeScreen onRefresh={handleRefresh} />;
+    }
+  };
 
   return (
-    <AppContext.Provider value={{ weather, trends }}>
-      {children}
-    </AppContext.Provider>
+    <div className="size-full bg-background">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.2 }}
+        >
+          {renderScreen()}
+        </motion.div>
+      </AnimatePresence>
+      <Navigation
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
+    </div>
   );
-};
+}

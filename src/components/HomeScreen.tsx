@@ -1,6 +1,7 @@
-import { RefreshCw, Sun, TrendingUp, Instagram, Sparkles, ArrowRight, Shirt } from 'lucide-react';
+import { RefreshCw, Sun, TrendingUp, Sparkles, ArrowRight, Shirt } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { motion } from 'motion/react';
+import logo from 'figma:asset/193fb722733955e40b908a73febec6ab789781c0.png';
 
 interface HomeScreenProps {
   onRefresh: () => void;
@@ -11,17 +12,17 @@ export function HomeScreen({ onRefresh }: HomeScreenProps) {
     top: {
       name: 'Casual Hoodie',
       color: '#8B7355',
-      image: 'https://images.unsplash.com/photo-1760126130338-4e6c9043ee2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYXN1YWwlMjBob29kaWUlMjBmYXNoaW9ufGVufDF8fHx8MTc2MTQwNDQ2M3ww&ixlib=rb-4.1.0&q=80&w=1080',
+      image: 'https://images.unsplash.com/photo-1588932250351-36235af5c0f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWlnZSUyMGhvb2RpZSUyMHByb2R1Y3R8ZW58MXx8fHwxNzYxNDc2MDk5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
     },
     bottom: {
       name: 'Joggers',
       color: '#4A4A4A',
-      image: 'https://images.unsplash.com/photo-1715609104589-97585b210c6e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxqb2dnZXJzJTIwc3dlYXRwYW50cyUyMG91dGZpdHxlbnwxfHx8fDE3NjE0MDQ1NDl8MA&ixlib=rb-4.1.0&q=80&w=1080',
+      image: 'https://images.unsplash.com/photo-1654225307526-30d45703449b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxncmF5JTIwam9nZ2VycyUyMHBhbnRzfGVufDF8fHx8MTc2MTQ3NjA5OXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
     },
     shoes: {
       name: 'White Sneakers',
       color: '#F5F5F5',
-      image: 'https://images.unsplash.com/photo-1651371409956-20e79c06a8bb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3aGl0ZSUyMHNuZWFrZXJzJTIwc2hvZXN8ZW58MXx8fHwxNzYxMzkyNTc2fDA&ixlib=rb-4.1.0&q=80&w=1080',
+      image: 'https://images.unsplash.com/photo-1631482665588-d3a6f88e65f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3aGl0ZSUyMHNuZWFrZXJzJTIwcHJvZHVjdHxlbnwxfHx8fDE3NjEzODQ1MjZ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
     },
   };
 
@@ -37,9 +38,15 @@ export function HomeScreen({ onRefresh }: HomeScreenProps) {
     <div className="min-h-screen bg-background pb-24 px-4">
       <div className="max-w-md mx-auto pt-8 space-y-6">
         {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-foreground">CluelessAi</h1>
-          <p className="text-muted-foreground">Your AI-powered outfit companion</p>
+        <div className="flex flex-col items-start">
+          <motion.img 
+            src={logo} 
+            alt="CluelessAI Logo" 
+            className="w-20 h-20 object-contain"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          />
         </div>
 
         {/* Weather Widget */}
@@ -79,8 +86,7 @@ export function HomeScreen({ onRefresh }: HomeScreenProps) {
               <h2 className="text-foreground">Trending Now</h2>
             </div>
             <div className="flex items-center gap-1 text-muted-foreground">
-              <Instagram className="w-4 h-4" />
-              <span>TikTok • IG</span>
+              <span>As seen on social media</span>
             </div>
           </div>
           
@@ -90,28 +96,28 @@ export function HomeScreen({ onRefresh }: HomeScreenProps) {
                 name: 'Baggy Jeans',
                 platform: 'TikTok',
                 views: '45M',
-                image: 'https://images.unsplash.com/photo-1758505805301-77805195fdb9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiYWdneSUyMGplYW5zJTIwc3R5bGV8ZW58MXx8fHwxNzYxNDIxMDY1fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+                image: 'https://images.unsplash.com/photo-1560241088-7ddb7e9513b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiYWdneSUyMGplYW5zJTIwZGVuaW18ZW58MXx8fHwxNzYxNDc2MTAwfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
                 matchInWardrobe: true,
               },
               {
                 name: 'Oversized Blazer',
                 platform: 'Instagram',
                 views: '32M',
-                image: 'https://images.unsplash.com/photo-1700575083904-d5e3279a8cb8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvdmVyc2l6ZWQlMjBibGF6ZXIlMjBvdXRmaXR8ZW58MXx8fHwxNzYxNDIxMDY1fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+                image: 'https://images.unsplash.com/photo-1726608869833-a0541c9bba5a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvdmVyc2l6ZWQlMjBibGF6ZXIlMjBqYWNrZXR8ZW58MXx8fHwxNzYxNDc2MTAwfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
                 matchInWardrobe: false,
               },
               {
                 name: 'Streetwear',
                 platform: 'TikTok',
                 views: '89M',
-                image: 'https://images.unsplash.com/photo-1627962534033-0818d66f82ed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdHJlZXR3ZWFyJTIwZmFzaGlvbiUyMHRyZW5kaW5nJTIwb3V0Zml0fGVufDF8fHx8MTc2MTQyMTA2NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+                image: 'https://images.unsplash.com/photo-1711387718409-a05f62a3dc39?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdHJlZXR3ZWFyJTIwaG9vZGllJTIwY2xvdGhpbmd8ZW58MXx8fHwxNzYxNDc2MTAwfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
                 matchInWardrobe: true,
               },
               {
                 name: 'Minimal Chic',
                 platform: 'Instagram',
                 views: '28M',
-                image: 'https://images.unsplash.com/photo-1643050511516-ea75dc317ae4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBtaW5pbWFsaXN0JTIwZmFzaGlvbnxlbnwxfHx8fDE3NjE0MjEwNjV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+                image: 'https://images.unsplash.com/photo-1542219550-b1b13a6a29eb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaW5pbWFsJTIwdHNoaXJ0JTIwY2xvdGhpbmd8ZW58MXx8fHwxNzYxNDc2MTAxfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
                 matchInWardrobe: true,
               },
             ].map((trend, index) => (
@@ -254,7 +260,7 @@ export function HomeScreen({ onRefresh }: HomeScreenProps) {
                   </div>
                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary flex-shrink-0 border border-border">
                     <ImageWithFallback
-                      src="https://images.unsplash.com/photo-1727515546577-f7d82a47b51d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxibGF6ZXIlMjBmYXNoaW9uJTIwb3V0Zml0fGVufDF8fHx8MTc2MTQyMTcyOHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                      src="https://images.unsplash.com/photo-1646888000308-620e64df78fe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxibGF6ZXIlMjBqYWNrZXQlMjBwcm9kdWN0fGVufDF8fHx8MTc2MTQ3NjEwMXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
                       alt="Blazer"
                       className="w-full h-full object-cover"
                     />
@@ -269,7 +275,7 @@ export function HomeScreen({ onRefresh }: HomeScreenProps) {
                   </div>
                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary flex-shrink-0 border border-border">
                     <ImageWithFallback
-                      src="https://images.unsplash.com/photo-1709899504137-575171b3258d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcm9zc2JvZHklMjBiYWclMjBhY2Nlc3Nvcnl8ZW58MXx8fHwxNzYxNDIxNzI4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                      src="https://images.unsplash.com/photo-1709899629440-64da054379d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcm9zc2JvZHklMjBiYWclMjBsZWF0aGVyfGVufDF8fHx8MTc2MTM3NDUxMnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
                       alt="Crossbody bag"
                       className="w-full h-full object-cover"
                     />

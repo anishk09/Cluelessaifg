@@ -1,15 +1,14 @@
-import { Home, Shirt, BarChart3, User } from 'lucide-react';
+import { Home, Shirt, User } from 'lucide-react';
 
 interface NavigationProps {
-  activeTab: 'home' | 'closet' | 'analytics' | 'profile';
-  onTabChange: (tab: 'home' | 'closet' | 'analytics' | 'profile') => void;
+  activeTab: 'home' | 'closet' | 'profile';
+  onTabChange: (tab: 'home' | 'closet' | 'profile') => void;
 }
 
 export function Navigation({ activeTab, onTabChange }: NavigationProps) {
   const tabs = [
     { id: 'home' as const, label: 'Home', icon: Home },
     { id: 'closet' as const, label: 'Closet', icon: Shirt },
-    { id: 'analytics' as const, label: 'Analytics', icon: BarChart3 },
     { id: 'profile' as const, label: 'Profile', icon: User },
   ];
 
