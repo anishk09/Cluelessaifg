@@ -1,53 +1,55 @@
-import { useState } from "react";
-import { Navigation } from "./components/Navigation";
-import { HomeScreen } from "./components/HomeScreen";
-import { ClosetScreen } from "./components/ClosetScreen";
-import { AnalyticsScreen } from "./components/AnalyticsScreen";
-import { ProfileScreen } from "./components/ProfileScreen";
-import { motion, AnimatePresence } from "motion/react";
+import React from "react";
+import { withAuthenticator } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
+import Amplify from "aws-amplify";
+import awsConfig from "./aws-config";
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState<
-    "home" | "closet" | "analytics" | "profile"
-  >("home");
+Amplify.configure(awsConfig);
 
-  const handleRefresh = () => {
-    // In a real app, this would fetch a new outfit recommendation
-    console.log("Refreshing outfit...");
+type AppProps = {
+  signOut: () => void;
+  user: {
+    username: string;
+    attributes?: Record<string, any>;
   };
+};
 
-  const renderScreen = () => {
-    switch (activeTab) {
-      case "home":
-        return <HomeScreen onRefresh={handleRefresh} />;
-      case "closet":
-        return <ClosetScreen />;
-      case "analytics":
-        return <AnalyticsScreen />;
-      case "profile":
-        return <ProfileScreen />;
-      default:
-        return <HomeScreen onRefresh={handleRefresh} />;
-    }
-  };
-
+function App({ signOut, user }: AppProps) {
   return (
-    <div className="size-full bg-background">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.2 }}
-        >
-          {renderScreen()}
-        </motion.div>
-      </AnimatePresence>
-      <Navigation
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#0f172a",
+        color: "#fff",
+        fontFamily: "Inter, sans-serif",
+      }}
+    >
+      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
+        👗 Welcome to Clueless AI
+      </h1>
+      <p style={{ marginBottom: "1rem" }}>
+        Signed in as <strong>{user?.username}</strong>
+      </p>
+      <button
+        onClick={signOut}
+        style={{
+          backgroundColor: "#ec4899",
+          color: "white",
+          padding: "0.6rem 1.2rem",
+          border: "none",
+          borderRadius: "8px",
+          cursor: "pointer",
+          fontWeight: 600,
+        }}
+      >
+        Sign out
+      </button>
     </div>
   );
 }
+
+export default withAuthenticator(App);
