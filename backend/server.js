@@ -20,15 +20,16 @@ const upload = multer({ storage: multer.memoryStorage() });
 app.get('/weather', async (req, res) => {
   const { zip } = req.query;
   try {
-    const response = await axios.get(`${process.env.VIPE_WEATHER_API_URL}/weather`, {
+    const response = await axios.get(`${process.env.VIP_WEATHER_API_URL}/weather`, {
       params: {
         zip,                       // <-- Use ZIP code
-        appid: process.env.VIPE_WEATHER_API_KEY,
-        units: 'metric',
+        appid: process.env.VIP_WEATHER_API_KEY,
+        units: 'imperial',
       },
     });
     res.json(response.data);
   } catch (err) {
+    console.error('Weather error', err?.response?.data || err.message);
     res.status(500).json({ error: 'Failed to fetch weather' });
   }
 });
@@ -44,7 +45,7 @@ app.get('/gemini', async (req, res) => {
   try {
     const response = await axios.get('https://content.googleapis.com/customsearch/v1', {
       params: {
-        key: process.env.VIPTE_GEMI_API_KEY,
+        key: process.env.VIP_GEMINI_API_KEY,
         cx: process.env.GOOGLE_CX_ID, // Add this to your .env
         q: query,
       },
@@ -53,6 +54,90 @@ app.get('/gemini', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch Gemini search' });
+  }
+});
+
+// --------------------
+// Trends Endpoint (Pinterest + TikTok) - used by frontend at /api/fetchTrends
+// --------------------
+function filterByWeather(item, temp) {
+  const keywords = (item.name || '').toLowerCase();
+  if (temp < 55) return keywords.includes('jacket') || keywords.includes('coat') || keywords.includes('boots');
+  if (temp >= 55 && temp <= 75) return keywords.includes('jacket') || keywords.includes('sweater');
+  if (temp > 75) return keywords.includes('shorts') || keywords.includes('t-shirt') || keywords.includes('dress');
+  return true;
+}
+
+async function getPinterestTrends() {
+  try {
+    const res = await axios.get('https://pinterest-api3.p.rapidapi.com/search/pins', {
+      params: { query: 'fashion trends', limit: 10 },
+      headers: {
+        'X-RapidAPI-Host': 'pinterest-api3.p.rapidapi.com',
+        'X-RapidAPI-Key': process.env.RAPIDAPI_KEY,
+      },
+    });
+    const data = res.data || {};
+    return (data.pins || []).map(pin => ({
+      id: pin.id,
+      name: pin.title || pin.description || 'Pinterest Item',
+      image: pin.image_url || (pin.images && pin.images[0] && pin.images[0].url) || '',
+      source: 'Pinterest',
+    }));
+  } catch (err) {
+    console.error('Pinterest fetch error', err?.response?.data || err.message);
+    return [];
+  }
+}
+
+async function getTikTokTrends() {
+  try {
+    const res = await axios.get('https://tiktok-trending-data.p.rapidapi.com/trending', {
+      params: { region: 'US', count: 10 },
+      headers: {
+        'X-RapidAPI-Host': 'tiktok-trending-data.p.rapidapi.com',
+        'X-RapidAPI-Key': process.env.RAPIDAPI_KEY,
+      },
+    });
+    const data = res.data || {};
+    return (data.trends || []).map(trend => ({
+      id: trend.id || trend.videoId || Math.random().toString(36).slice(2),
+      name: trend.title || trend.description || 'TikTok Trend',
+      image: trend.image_url || trend.cover || '',
+      source: 'TikTok',
+    }));
+  } catch (err) {
+    console.error('TikTok fetch error', err?.response?.data || err.message);
+    return [];
+  }
+}
+
+app.get('/api/fetchTrends', async (req, res) => {
+  try {
+    const zip = req.query.zip || '94103';
+    // Get weather (use VIP_WEATHER_API_URL and VIP_WEATHER_API_KEY from .env)
+    const weatherResp = await axios.get(`${process.env.VIP_WEATHER_API_URL}/weather`, {
+      params: { zip, appid: process.env.VIP_WEATHER_API_KEY, units: 'imperial' },
+    });
+    const weather = weatherResp.data;
+    const temp = weather?.main?.temp || 60;
+
+    const [pinterest, tiktok] = await Promise.all([getPinterestTrends(), getTikTokTrends()]);
+
+    const pinterestTrends = pinterest.filter(item => filterByWeather(item, temp));
+    const tiktokTrends = tiktok.filter(item => filterByWeather(item, temp));
+
+    res.json({
+      weather: {
+        temp,
+        conditions: (weather?.weather && weather.weather[0]?.main || '').toLowerCase(),
+        description: weather?.weather && weather.weather[0]?.description || '',
+      },
+      trends: [...pinterestTrends, ...tiktokTrends],
+    });
+  } catch (err) {
+    console.error('Error fetching trends', err?.response?.data || err.message);
+    res.status(500).json({ message: 'Failed to fetch trends', error: err.message });
   }
 });
 
