@@ -2,9 +2,10 @@ import React from "react";
 import { withAuthenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { Amplify } from "aws-amplify";
-import awsConfig from "./aws-config";
+import { amplifyConfig } from "./aws-config";
 
-Amplify.configure(awsConfig);
+
+Amplify.configure(amplifyConfig);
 
 type AppProps = {
   signOut: () => void;
