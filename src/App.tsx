@@ -1,53 +1,49 @@
-import { useState } from "react";
-import { Navigation } from "./components/Navigation";
-import { HomeScreen } from "./components/HomeScreen";
-import { ClosetScreen } from "./components/ClosetScreen";
-import { AnalyticsScreen } from "./components/AnalyticsScreen";
-import { ProfileScreen } from "./components/ProfileScreen";
-import { motion, AnimatePresence } from "motion/react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState<
-    "home" | "closet" | "analytics" | "profile"
-  >("home");
+interface Weather {
+  temp: number;
+  condition: string;
+}
 
-  const handleRefresh = () => {
-    // In a real app, this would fetch a new outfit recommendation
-    console.log("Refreshing outfit...");
-  };
+interface Trend {
+  name: string;
+  views: string;
+  image: string;
+}
 
-  const renderScreen = () => {
-    switch (activeTab) {
-      case "home":
-        return <HomeScreen onRefresh={handleRefresh} />;
-      case "closet":
-        return <ClosetScreen />;
-      case "analytics":
-        return <AnalyticsScreen />;
-      case "profile":
-        return <ProfileScreen />;
-      default:
-        return <HomeScreen onRefresh={handleRefresh} />;
-    }
-  };
+interface AppContextType {
+  weather: Weather | null;
+  trends: Trend[];
+}
+
+const AppContext = createContext<AppContextType>({
+  weather: null,
+  trends: [],
+});
+
+export const useAppContext = () => useContext(AppContext);
+
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [weather, setWeather] = useState<Weather | null>(null);
+  const [trends, setTrends] = useState<Trend[]>([]);
+
+  useEffect(() => {
+    // Fetch weather
+    fetch("http://localhost:5000/weather?city=New%20York")
+      .then((res) => res.json())
+      .then((data) => setWeather(data))
+      .catch(console.error);
+
+    // Fetch trends
+    fetch("http://localhost:5000/trends")
+      .then((res) => res.json())
+      .then((data) => setTrends(data))
+      .catch(console.error);
+  }, []);
 
   return (
-    <div className="size-full bg-background">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.2 }}
-        >
-          {renderScreen()}
-        </motion.div>
-      </AnimatePresence>
-      <Navigation
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
-    </div>
+    <AppContext.Provider value={{ weather, trends }}>
+      {children}
+    </AppContext.Provider>
   );
-}
+};
